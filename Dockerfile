@@ -9,7 +9,6 @@ RUN mkdir -p /usr/local/ophidia/{extra,src,oph-server,oph-terminal} \
 RUN echo "Acquire::http::Proxy \"http://roadrash:3142\";" | sudo tee /etc/apt/apt.conf.d/01proxy
 
 RUN apt-get update && apt-get install -y \
-		git \
 		guile-2.0-dev \
 		libcurl4-openssl-dev \
 		libgsl0-dev \
@@ -32,9 +31,9 @@ RUN apt-get update && apt-get install -y \
     libgraphviz-dev \
     libmysql-cil-dev \
     unzip \
-#		libmunge-dev \
-#		libreadline-dev \
 	 && rm -rf /var/lib/apt/lists/*
+
+
 
 
 ### Build dependencies
@@ -65,10 +64,10 @@ RUN CC=/usr/bin/mpicc \
 
 ### Ophidia projects
 WORKDIR /usr/local/ophidia/src
-RUN git clone https://github.com/OphidiaBigData/ophidia-primitives ;\
-    git clone https://github.com/OphidiaBigData/ophidia-analytics-framework ;\
-    git clone https://github.com/OphidiaBigData/ophidia-server ;\
-    git clone https://github.com/OphidiaBigData/ophidia-terminal
+COPY ophidia-primitives ./
+COPY ophidia-analytics-framework ./
+COPY ophidia-server ./
+COPY ophidia-terminal ./
 
 WORKDIR /usr/local/ophidia/src/ophidia-primitives
 RUN ln -s /usr/lib/x86_64-linux-gnu/pkgconfig/libmatheval.pc /usr/local/lib/pkgconfig/libmatheval.pc \
@@ -105,4 +104,14 @@ RUN patch -p1 < ophidia-terminal-cast.patch \
   && ./configure --prefix=/usr/local/ophidia/oph-terminal \
   && make && make install
 
+RUN apt-get purge -fy \
+		wget \
+    build-essential \
+    byacc \
+    dh-autoreconf \
+    flex \
+    unzip \
+ && apt-get clean && apt-get autoremove
+
+WORKDIR /usr/local/ophidia
 ENTRYPOINT ["/bin/bash"]
