@@ -1,0 +1,12 @@
+[submodule "ophidia-primitives"]
+	path = ophidia-primitives
+	url = https://github.com/OphidiaBigData/ophidia-primitives
+[submodule "ophidia-analytics-framework"]
+	path = ophidia-analytics-framework
+	url = https://github.com/OphidiaBigData/ophidia-analytics-framework
+[submodule "ophidia-server"]
+	path = ophidia-server
+	url = https://github.com/OphidiaBigData/ophidia-server
+[submodule "ophidia-terminal"]
+	path = ophidia-terminal
+	url = https://github.com/OphidiaBigData/ophidia-terminal
