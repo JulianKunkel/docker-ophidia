@@ -30,11 +30,9 @@ RUN apt-get update && apt-get install -y \
     libbison-dev \
     libgraphviz-dev \
     libmysql-cil-dev \
+    libreadline-dev \
     unzip \
 	 && rm -rf /var/lib/apt/lists/*
-
-
-
 
 ### Build dependencies
 
@@ -64,10 +62,10 @@ RUN CC=/usr/bin/mpicc \
 
 ### Ophidia projects
 WORKDIR /usr/local/ophidia/src
-COPY ophidia-primitives ./
-COPY ophidia-analytics-framework ./
-COPY ophidia-server ./
-COPY ophidia-terminal ./
+COPY ophidia-primitives ./ophidia-primitives
+COPY ophidia-analytics-framework ./ophidia-analytics-framework
+COPY ophidia-server ./ophidia-server
+COPY ophidia-terminal ./ophidia-terminal
 
 WORKDIR /usr/local/ophidia/src/ophidia-primitives
 RUN ln -s /usr/lib/x86_64-linux-gnu/pkgconfig/libmatheval.pc /usr/local/lib/pkgconfig/libmatheval.pc \
