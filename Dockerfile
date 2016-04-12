@@ -1,4 +1,5 @@
 FROM ubuntu:14.04
+MAINTAINER Guilherme Maluf <guimalufb@gmail.com>
 
 #RUN useradd -r ophidia -d /usr/local/ophidia
 RUN mkdir -p /usr/local/ophidia/{extra,src,oph-server,oph-terminal} \
