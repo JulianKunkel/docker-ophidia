@@ -44,15 +44,15 @@ RUN ./configure --prefix=/usr/local/ophidia/extra && make && make install
 
 ## HDF5
 RUN wget https://www.hdfgroup.org/ftp/HDF5/current/src/hdf5-1.8.16.tar.bz2 -qO- \
-    | tar xj -C /usr/local/ophidia/extra/
-WORKDIR /usr/local/ophidia/extra/hdf5-1.8.16
+    | tar xj -C /usr/local/ophidia/src/
+WORKDIR /usr/local/ophidia/src/hdf5-1.8.16
 RUN CC=/usr/bin/mpicc ./configure --prefix=/usr/local/ophidia/extra --enable-parallel \
     && make && make install
 
 ## netCDF
 RUN wget ftp://ftp.unidata.ucar.edu/pub/netcdf/netcdf-4.4.0.tar.gz -qO- \
-    | tar xz -C /usr/local/ophidia/extra/
-WORKDIR /usr/local/ophidia/extra/netcdf-4.4.0
+    | tar xz -C /usr/local/ophidia/src/
+WORKDIR /usr/local/ophidia/src/netcdf-4.4.0
 RUN CC=/usr/bin/mpicc \
     CPPFLAGS="-I/usr/local/ophidia/extra/include" \
     LDFLAGS="-L/usr/local/ophidia/extra/lib" \
@@ -109,7 +109,9 @@ RUN apt-get purge -fy \
     dh-autoreconf \
     flex \
     unzip \
- && apt-get clean && apt-get autoremove
+ && apt-get clean autoclean && apt-get autoremove -fy
+
+RUN rm -rf /usr/local/ophidia/src /var/lib/{apt,dpkg,cache,log}/
 
 WORKDIR /usr/local/ophidia
 ENTRYPOINT ["/bin/bash"]
