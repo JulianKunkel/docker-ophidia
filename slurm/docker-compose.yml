@@ -1,0 +1,35 @@
+node0:
+  hostname: node0
+  image: guimaluf/slurm:latest
+  command: node
+  volumes:
+    - ./slurm.conf:/etc/slurm-llnl/slurm.conf
+  extra_hosts:
+    master: 172.17.0.3
+
+node1:
+  hostname: node1
+  image: guimaluf/slurm:latest
+  command: node
+  volumes:
+    - ./slurm.conf:/etc/slurm-llnl/slurm.conf
+  extra_hosts:
+    master: 172.17.0.3
+node2:
+  hostname: node2
+  image: guimaluf/slurm:latest
+  command: node
+  volumes:
+    - ./slurm.conf:/etc/slurm-llnl/slurm.conf
+  extra_hosts:
+    master: 172.17.0.3
+#master:
+#  hostname: master
+#  image: guimaluf/slurm:latest
+#  command: master
+#  volumes:
+#    - ./slurm.conf:/etc/slurm-llnl/slurm.conf
+#  links:
+#    - node0
+#    - node1
+#    - node2
