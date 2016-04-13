@@ -1,11 +1,10 @@
 FROM ubuntu:14.04
 MAINTAINER Guilherme Maluf <guimalufb@gmail.com>
 
-#RUN useradd -r ophidia -d /usr/local/ophidia
-RUN mkdir -p /usr/local/ophidia/{extra,src,oph-server,oph-terminal} \
-             /usr/local/ophidia/oph-cluster/{oph-primitives,oph-analytics-framework} \
+RUN useradd -r ophidia -d /usr/local/ophidia
+RUN mkdir -p /usr/local/ophidia/src \
              /var/www/html/ophidia \
-             /usr/local/lib/pkgconfig/
+             /usr/local/lib/pkgconfig
 
 RUN echo "Acquire::http::Proxy \"http://roadrash:3142\";" | sudo tee /etc/apt/apt.conf.d/01proxy
 
@@ -33,7 +32,9 @@ RUN apt-get update && apt-get install -y \
     libmysql-cil-dev \
     libreadline-dev \
     unzip \
-	 && rm -rf /var/lib/apt/lists/*
+    slurm-llnl \
+    openssh-server \
+  && rm -rf /var/lib/apt/lists/*
 
 ### Build dependencies
 
@@ -60,6 +61,7 @@ RUN CC=/usr/bin/mpicc \
     LIBS=-ldl \
     ./configure --prefix=/usr/local/ophidia/extra --enable-parallel-tests \
     && make && make install
+###
 
 ### Ophidia projects
 WORKDIR /usr/local/ophidia/src
@@ -93,7 +95,9 @@ RUN  patch -p1 < ophidia-server_ubuntu-makefile-libs.patch \
                  --with-soapcpp2-path=/usr/local/ophidia/extra \
                  --enable-webaccess --with-web-server-path=/var/www/html/ophidia \
                  --with-web-server-url=http://127.0.0.1/ophidia \
-  && make && make install
+  && make && make install \
+  && cp -r /usr/local/ophidia/src/ophidia-server/authz /usr/local/ophidia/oph-server/ \
+  && mkdir /usr/local/ophidia/oph-server/authz/sessions
 
 
 WORKDIR /usr/local/ophidia/src/ophidia-terminal
@@ -102,6 +106,19 @@ RUN patch -p1 < ophidia-terminal-cast.patch \
   && ./bootstrap \
   && ./configure --prefix=/usr/local/ophidia/oph-terminal \
   && make && make install
+
+####
+
+RUN ssh-keygen -t rsa -N "" -f /root/.ssh/id_rsa \
+  && cp /root/.ssh/id_rsa.pub /root/.ssh/authorized_keys \
+  && echo 'Host *\n  StrictHostKeyChecking no\n  UserKnownHostsFile=/dev/null' > /root/.ssh/config \
+  && sed -i 's/PermitRootLogin without-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+
+## Slurm
+RUN /usr/sbin/create-munge-key \
+  && echo "OPTIONS=\"--force --num-threads 1\"" >> /etc/default/munge \
+  && mkdir -p /var/run/slurm-llnl/
+COPY slurm.conf /etc/slurm-llnl/
 
 RUN apt-get purge -fy \
 		wget \
@@ -115,4 +132,9 @@ RUN apt-get purge -fy \
 RUN rm -rf /usr/local/ophidia/src /var/lib/{apt,dpkg,cache,log}/
 
 WORKDIR /usr/local/ophidia
-ENTRYPOINT ["/bin/bash"]
+
+#VOLUME ["/etc/slurm-llnl/slurm.conf"]
+ENV PATH=$PATH:/usr/local/ophidia/oph-cluster/oph-analytics-framework/bin:/usr/local/ophidia/oph-terminal/bin:/usr/local/ophidia/extra/bin:/usr/local/ophidia/oph-server/bin
+ADD entrypoint /sbin/
+ENTRYPOINT ["/sbin/entrypoint"]
+CMD ["master"]

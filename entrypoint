@@ -1,0 +1,16 @@
+#!/bin/sh
+service ssh start
+service munge start
+
+case $1 in
+  master)
+    /usr/sbin/slurmctld -D
+    /usr/sbin/slurmd -D
+    ;;
+  node)
+    /usr/sbin/slurmd -D
+    ;;
+  *)
+    eval $*
+    ;;
+esac
