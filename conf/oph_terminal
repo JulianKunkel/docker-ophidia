@@ -1,0 +1,9 @@
+export OPH_TERM_PS1=yellow
+export OPH_USER=root
+export OPH_PASSWD=root
+export OPH_SERVER_HOST=server.ophidia.com
+export OPH_SERVER_PORT=11732
+export OPH_EXEC_MODE=interactive
+export OPH_NCORES=4
+export OPH_TERM_VIEWER=coloured
+export OPH_TERM_IMGS=open
