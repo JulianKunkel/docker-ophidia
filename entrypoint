@@ -3,9 +3,11 @@ service ssh start
 service munge start
 
 case $1 in
-  master)
-    /usr/sbin/slurmctld -D
-    /usr/sbin/slurmd -D
+  server)
+    /usr/sbin/slurmctld
+    /usr/sbin/slurmd
+    /usr/local/ophidia/oph-server/bin/oph_server -d &
+    /usr/local/ophidia/oph-terminal/bin/oph_term -H 127.0.0.1 -u oph-test -p abcd -P 11732
     ;;
   node)
     /usr/sbin/slurmd -D

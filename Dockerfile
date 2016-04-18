@@ -137,4 +137,4 @@ WORKDIR /usr/local/ophidia
 ENV PATH=$PATH:/usr/local/ophidia/oph-cluster/oph-analytics-framework/bin:/usr/local/ophidia/oph-terminal/bin:/usr/local/ophidia/extra/bin:/usr/local/ophidia/oph-server/bin
 ADD entrypoint /sbin/
 ENTRYPOINT ["/sbin/entrypoint"]
-CMD ["master"]
+CMD ["server"]
