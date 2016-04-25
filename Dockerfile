@@ -131,9 +131,21 @@ RUN apt-get purge -fy \
 
 RUN rm -rf /usr/local/ophidia/src /var/lib/{apt,dpkg,cache,log}/
 
+WORKDIR /etc/ssl/private/
+RUN openssl genrsa -out rootCA.key 2048 \
+  && openssl req -x509 -new -nodes -key rootCA.key \
+     -sha256 -days 1024 -out rootCA.pem \
+     -subj "/C=BR/ST=MG/L=BH/O=BigSea/OU=Speed/CN=*" \
+  && openssl genrsa -out server.key 2048 \
+  && openssl req -new -key server.key -out server.csr \
+     -subj "/C=BR/ST=MG/L=BH/O=BigSea/OU=Speed/CN=*" \
+  && openssl x509 -req -in server.csr \
+     -CA rootCA.pem -CAkey rootCA.key -CAcreateserial \
+     -out server.crt -days 500 -sha256 \
+  && cat server.key server.crt > server.pem
+
 WORKDIR /usr/local/ophidia
 
-#VOLUME ["/etc/slurm-llnl/slurm.conf"]
 ENV PATH=$PATH:/usr/local/ophidia/oph-cluster/oph-analytics-framework/bin:/usr/local/ophidia/oph-terminal/bin:/usr/local/ophidia/extra/bin:/usr/local/ophidia/oph-server/bin
 ADD entrypoint /sbin/
 ENTRYPOINT ["/sbin/entrypoint"]
