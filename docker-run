@@ -3,9 +3,15 @@ OPH_PREFIX=/usr/local/ophidia
 docker run --name oph_mysql -d \
   --volume ${PWD}/mysql/initdb:/docker-entrypoint-initdb.d \
   --env MYSQL_ROOT_PASSWORD=root \
-  guimaluf/ophidia-mysql || docker start oph_mysql
+  guimaluf/ophidia-mysql &> /dev/null || docker start oph_mysql
 
-docker run -ti --rm \
+docker run -d --name node1 --hostname node1 \
+  --volume ${PWD}/slurm.conf:/etc/slurm-llnl/slurm.conf \
+  --add-host master:172.17.0.5 \
+  guimaluf/ophidia node
+
+docker run -ti --rm --name master --hostname master \
+  --volume ${PWD}/slurm.conf:/etc/slurm-llnl/slurm.conf \
   --volume ${PWD}/conf/authz:${OPH_PREFIX}/oph-server/authz \
   --volume ${PWD}/conf/oph-server/ophidiadb.conf:${OPH_PREFIX}/oph-server/etc/ophidiadb.conf \
   --volume ${PWD}/conf/oph-server/rmanager.conf:${OPH_PREFIX}/oph-server/etc/rmanager.conf \
@@ -13,5 +19,5 @@ docker run -ti --rm \
   --volume ${PWD}/conf/oph-analytics-framework/oph_configuration:${OPH_PREFIX}/oph-cluster/oph-analytics-framework/etc/oph_configuration \
   --volume ${PWD}/conf/oph-analytics-framework/oph_dim_configuration:${OPH_PREFIX}/oph-cluster/oph-analytics-framework/etc/oph_dim_configuration \
   --volume ${PWD}/conf/oph-analytics-framework/oph_soap_configuration:${OPH_PREFIX}/oph-cluster/oph-analytics-framework/etc/oph_soap_configuration \
-  --link oph_mysql:mysql \
+  --link oph_mysql:mysql --link node1:node1 \
   guimaluf/ophidia
