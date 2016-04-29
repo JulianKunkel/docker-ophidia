@@ -1,16 +1,25 @@
 #!/bin/sh
-service ssh start
-service munge start
+OPH_USER=${OPH_USER:="oph-test"}
+OPH_PASSWD=${OPH_PASSWD:="abcd"}
 
 case $1 in
   server)
+    service ssh start
+    service munge start
+    service apache2 start
     /usr/sbin/slurmctld
     /usr/sbin/slurmd
-    /usr/local/ophidia/oph-server/bin/oph_server -d &
-    /usr/local/ophidia/oph-terminal/bin/oph_term -H 127.0.0.1 -u oph-test -p abcd -P 11732
+    /usr/local/ophidia/oph-server/bin/oph_server -d
     ;;
   node)
+    service ssh start
+    service munge start
     /usr/sbin/slurmd -D
+    ;;
+  term)
+    OPH_SERVER_HOST=${OPH_SERVER_HOST:-$OPH_SERVER_PORT_11732_TCP_ADDR}
+    OPH_SERVER_PORT=${OPH_SERVER_PORT_11732_TCP_PORT:-11732}
+    /usr/local/ophidia/oph-terminal/bin/oph_term -H $OPH_SERVER_HOST -u $OPH_USER -p $OPH_PASSWD -P $OPH_SERVER_PORT
     ;;
   *)
     eval $*

@@ -23,6 +23,7 @@ RUN apt-get update && apt-get install -y \
 		libxml2-dev \
 		mpich \
 		wget \
+    apache2 \
     build-essential \
     byacc \
     dh-autoreconf \
@@ -31,9 +32,10 @@ RUN apt-get update && apt-get install -y \
     libgraphviz-dev \
     libmysql-cil-dev \
     libreadline-dev \
-    unzip \
-    slurm-llnl \
     openssh-server \
+    php5 \
+    slurm-llnl \
+    unzip \
   && rm -rf /var/lib/apt/lists/*
 
 ### Build dependencies
@@ -89,7 +91,7 @@ RUN patch -p1 < ophidia-analytics-framework_netcdf_vars.patch \
  && ./bootstrap \
  && ./configure  --prefix=/usr/local/ophidia/oph-cluster/oph-analytics-framework \
                  --enable-parallel-netcdf --with-netcdf-path=/usr/local/ophidia/extra/ \
-                 --with-web-server-path=/var/www/html/ophidia --with-web-server-url=http://127.0.0.1/ophidia \
+                 --with-web-server-path=/var/www/html/ophidia --with-web-server-url=http://master/ophidia \
  && make && make install \
  && rm -rf /usr/local/ophidia/src/ophidia-analytics-framework
 
@@ -100,11 +102,12 @@ RUN  patch -p1 < ophidia-server_ubuntu-makefile-libs.patch \
   && ./configure --prefix=/usr/local/ophidia/oph-server \
                  --with-soapcpp2-path=/usr/local/ophidia/extra \
                  --enable-webaccess --with-web-server-path=/var/www/html/ophidia \
-                 --with-web-server-url=http://127.0.0.1/ophidia \
+                 --with-web-server-url=http://master/ophidia \
   && make && make install \
   && cp -r /usr/local/ophidia/src/ophidia-server/authz /usr/local/ophidia/oph-server/ \
-  && mkdir /usr/local/ophidia/oph-server/authz/sessions \
+  && mkdir /usr/local/ophidia/oph-server/authz/sessions /usr/local/ophidia/oph-server/txt \
   && rm -rf /usr/local/ophidia/src/ophidia-server
+COPY liboph_listoperator.so /usr/local/ophidia/oph-cluster/oph-analytics-framework/lib/drivers/liboph_listoperator.so
 
 
 WORKDIR /usr/local/ophidia/src/ophidia-terminal
@@ -152,9 +155,22 @@ RUN openssl genrsa -out rootCA.key 2048 \
      -out server.crt -days 500 -sha256 \
   && cat server.key server.crt > server.pem
 
+WORKDIR /etc/apache2/
+RUN sed -i 's/\(<\/VirtualHost>\)/\tRedirectMatch permanent \/ophidia\/sessions\/(.*) \/ophidia\/sessions.php\/\$1\n\1/g' \
+     sites-available/000-default.conf \
+  && echo "StartServers 1\nMinSpareServers 1\nMaxSpareServers 1" > conf-available/server-threads.conf \
+  && a2enconf server-threads \
+  && a2enmod ssl \
+  && a2ensite default-ssl
+
 WORKDIR /usr/local/ophidia
 
+EXPOSE 11732
 ENV PATH=$PATH:/usr/local/ophidia/oph-cluster/oph-analytics-framework/bin:/usr/local/ophidia/oph-terminal/bin:/usr/local/ophidia/extra/bin:/usr/local/ophidia/oph-server/bin
+ENV OPH_SERVER_HOST=""
+ENV OPH_SERVER_PORT=11732
+ENV OPH_USER=oph-test
+ENV OPH_PASSWD=abcd
 ADD entrypoint /sbin/
 ENTRYPOINT ["/sbin/entrypoint"]
 CMD ["server"]

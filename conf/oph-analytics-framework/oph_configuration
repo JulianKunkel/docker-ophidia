@@ -3,6 +3,6 @@ MAPPERDB_HOST=mysql
 MAPPERDB_PORT=3306
 MAPPERDB_LOGIN=root
 MAPPERDB_PWD=root
-WEB_SERVER=http://127.0.0.1/ophidia
+WEB_SERVER=http://oph-server/ophidia
 WEB_SERVER_LOCATION=/var/www/html/ophidia
 MEMORY=2048
