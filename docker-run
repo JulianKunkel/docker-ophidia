@@ -1,28 +1,49 @@
 #!/bin/bash
+function mysql {
+  docker run --name oph-mysql -d \
+    --volume ${PWD}/mysql/initdb:/docker-entrypoint-initdb.d \
+    --env MYSQL_ROOT_PASSWORD=root \
+    bigsea/ophidia-mysql &> /dev/null || docker start oph-mysql
+}
+
+function server {
+  docker run -d --name oph-server --hostname oph-server \
+    --volume ${PWD}/slurm.conf:/etc/slurm-llnl/slurm.conf \
+    --volume ${PWD}/conf/authz:/usr/local/ophidia/oph-server/authz \
+    --volume ${PWD}/conf/oph-server/ophidiadb.conf:/usr/local/ophidia/oph-server/etc/ophidiadb.conf \
+    --volume ${PWD}/conf/oph-server/rmanager.conf:/usr/local/ophidia/oph-server/etc/rmanager.conf \
+    --volume ${PWD}/conf/oph-server/server.conf:/usr/local/ophidia/oph-server/etc/server.conf \
+    --volume ${PWD}/conf/oph-analytics-framework/oph_configuration:/usr/local/ophidia/oph-cluster/oph-analytics-framework/etc/oph_configuration \
+    --volume ${PWD}/conf/oph-analytics-framework/oph_dim_configuration:/usr/local/ophidia/oph-cluster/oph-analytics-framework/etc/oph_dim_configuration \
+    --volume ${PWD}/conf/oph-analytics-framework/oph_soap_configuration:/usr/local/ophidia/oph-cluster/oph-analytics-framework/etc/oph_soap_configuration \
+    --link oph-mysql:mysql \
+    bigsea/ophidia &> /dev/null || docker start oph-server
+}
+
+function term {
+  docker run -ti --rm --name oph-term \
+    --link oph-server:oph-server \
+    bigsea/ophidia term
+}
+
 case $1 in
-  all|mysql)
-    docker run --name oph-mysql -d \
-      --volume ${PWD}/mysql/initdb:/docker-entrypoint-initdb.d \
-      --env MYSQL_ROOT_PASSWORD=root \
-      guimaluf/ophidia-mysql &> /dev/null || docker start oph-mysql
-    ;;
-  all|server)
-    docker run -d --name oph-server --hostname oph-server \
-      --volume ${PWD}/slurm.conf:/etc/slurm-llnl/slurm.conf \
-      --volume ${PWD}/conf/authz:/usr/local/ophidia/oph-server/authz \
-      --volume ${PWD}/conf/oph-server/ophidiadb.conf:/usr/local/ophidia/oph-server/etc/ophidiadb.conf \
-      --volume ${PWD}/conf/oph-server/rmanager.conf:/usr/local/ophidia/oph-server/etc/rmanager.conf \
-      --volume ${PWD}/conf/oph-server/server.conf:/usr/local/ophidia/oph-server/etc/server.conf \
-      --volume ${PWD}/conf/oph-analytics-framework/oph_configuration:/usr/local/ophidia/oph-cluster/oph-analytics-framework/etc/oph_configuration \
-      --volume ${PWD}/conf/oph-analytics-framework/oph_dim_configuration:/usr/local/ophidia/oph-cluster/oph-analytics-framework/etc/oph_dim_configuration \
-      --volume ${PWD}/conf/oph-analytics-framework/oph_soap_configuration:/usr/local/ophidia/oph-cluster/oph-analytics-framework/etc/oph_soap_configuration \
-      --link oph-mysql:mysql \
-      guimaluf/ophidia
-    ;;
-  all|term)
-    docker run -ti --rm --name oph-term \
-      --link oph-server:oph-server \
-      guimaluf/ophidia term
-    ;;
+  mysql)
+    mysql
+  ;;
+  server)
+    server
+  ;;
+  term)
+    term
+  ;;
+  all)
+    mysql
+    server
+    term
+  ;;
+  *)
+    echo "Usage: ${0} <all|mysql|server|term>"
+    exit 0
+	;;
 esac
 
