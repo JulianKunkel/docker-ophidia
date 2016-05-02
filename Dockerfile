@@ -91,7 +91,7 @@ RUN patch -p1 < ophidia-analytics-framework_netcdf_vars.patch \
  && ./bootstrap \
  && ./configure  --prefix=/usr/local/ophidia/oph-cluster/oph-analytics-framework \
                  --enable-parallel-netcdf --with-netcdf-path=/usr/local/ophidia/extra/ \
-                 --with-web-server-path=/var/www/html/ophidia --with-web-server-url=http://master/ophidia \
+                 --with-web-server-path=/var/www/html/ophidia --with-web-server-url=http://oph-server/ophidia \
  && make && make install \
  && rm -rf /usr/local/ophidia/src/ophidia-analytics-framework
 
@@ -102,7 +102,7 @@ RUN  patch -p1 < ophidia-server_ubuntu-makefile-libs.patch \
   && ./configure --prefix=/usr/local/ophidia/oph-server \
                  --with-soapcpp2-path=/usr/local/ophidia/extra \
                  --enable-webaccess --with-web-server-path=/var/www/html/ophidia \
-                 --with-web-server-url=http://master/ophidia \
+                 --with-web-server-url=http://oph-server/ophidia \
   && make && make install \
   && cp -r /usr/local/ophidia/src/ophidia-server/authz /usr/local/ophidia/oph-server/ \
   && mkdir /usr/local/ophidia/oph-server/authz/sessions /usr/local/ophidia/oph-server/txt \
@@ -153,7 +153,9 @@ RUN openssl genrsa -out rootCA.key 2048 \
   && openssl x509 -req -in server.csr \
      -CA rootCA.pem -CAkey rootCA.key -CAcreateserial \
      -out server.crt -days 500 -sha256 \
-  && cat server.key server.crt > server.pem
+  && cat server.key server.crt > server.pem \
+  && cp server.key ssl-cert-snakeoil.key \
+  && cp server.crt ../certs/ssl-cert-snakeoil.pem
 
 WORKDIR /etc/apache2/
 RUN sed -i 's/\(<\/VirtualHost>\)/\tRedirectMatch permanent \/ophidia\/sessions\/(.*) \/ophidia\/sessions.php\/\$1\n\1/g' \
