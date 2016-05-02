@@ -93,7 +93,8 @@ RUN patch -p1 < ophidia-analytics-framework_netcdf_vars.patch \
                  --enable-parallel-netcdf --with-netcdf-path=/usr/local/ophidia/extra/ \
                  --with-web-server-path=/var/www/html/ophidia --with-web-server-url=http://oph-server/ophidia \
  && make && make install \
- && rm -rf /usr/local/ophidia/src/ophidia-analytics-framework
+ && rm -rf /usr/local/ophidia/src/ophidia-analytics-framework \
+ && mkdir /usr/local/ophidia/oph-cluster/oph-analytics-framework/log
 
 WORKDIR /usr/local/ophidia/src/ophidia-server
 COPY ophidia-server_ubuntu-makefile-libs.patch /usr/local/ophidia/src/ophidia-server/
