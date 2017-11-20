@@ -3,7 +3,7 @@ function mysql {
   docker run --name oph-mysql -d \
     --volume ${PWD}/mysql/initdb:/docker-entrypoint-initdb.d \
     --env MYSQL_ROOT_PASSWORD=root \
-    bigsea/ophidia-mysql &> /dev/null || docker start oph-mysql
+    bigsea/ophidia_mysql &> /dev/null || docker start oph-mysql
 }
 
 function server {
@@ -46,4 +46,3 @@ case $1 in
     exit 0
 	;;
 esac
-
