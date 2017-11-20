@@ -79,6 +79,15 @@ $ docker run -ti --rm --name oph-term \
     bigsea/ophidia term
 ```
 
+Run a shell inside the ophidia server container:
+```
+docker exec -it oph-server bash
+```
+
+Follow the logfile:
+```
+tail -f /var/log/oph_server
+```
 
 # Examples
 ## Creation of NetCDF containers

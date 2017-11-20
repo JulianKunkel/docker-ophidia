@@ -84,20 +84,16 @@ RUN ln -s /usr/lib/x86_64-linux-gnu/pkgconfig/libmatheval.pc /usr/local/lib/pkgc
 
 
 WORKDIR  /usr/local/ophidia/src/ophidia-analytics-framework
-COPY ophidia-analytics-framework_netcdf_vars.patch /usr/local/ophidia/src/ophidia-analytics-framework/
-RUN patch -p1 < ophidia-analytics-framework_netcdf_vars.patch \
- && ./bootstrap \
+RUN ./bootstrap \
  && ./configure  --prefix=/usr/local/ophidia/oph-cluster/oph-analytics-framework \
                  --enable-parallel-netcdf --with-netcdf-path=/usr/local/ophidia/extra/ \
                  --with-web-server-path=/var/www/html/ophidia --with-web-server-url=http://oph-server/ophidia \
- && make && make install \
+ && make -j 4 && make install \
  && rm -rf /usr/local/ophidia/src/ophidia-analytics-framework \
  && mkdir /usr/local/ophidia/oph-cluster/oph-analytics-framework/log
 
 WORKDIR /usr/local/ophidia/src/ophidia-server
-COPY ophidia-server_ubuntu-makefile-libs.patch /usr/local/ophidia/src/ophidia-server/
-RUN  patch -p1 < ophidia-server_ubuntu-makefile-libs.patch \
-  && ./bootstrap \
+RUN  ./bootstrap \
   && ./configure --prefix=/usr/local/ophidia/oph-server \
                  --with-soapcpp2-path=/usr/local/ophidia/extra \
                  --enable-webaccess --with-web-server-path=/var/www/html/ophidia \
@@ -106,15 +102,12 @@ RUN  patch -p1 < ophidia-server_ubuntu-makefile-libs.patch \
   && cp -r /usr/local/ophidia/src/ophidia-server/authz /usr/local/ophidia/oph-server/ \
   && mkdir /usr/local/ophidia/oph-server/authz/sessions /usr/local/ophidia/oph-server/txt \
   && rm -rf /usr/local/ophidia/src/ophidia-server
-COPY liboph_listoperator.so /usr/local/ophidia/oph-cluster/oph-analytics-framework/lib/drivers/liboph_listoperator.so
 
 
 WORKDIR /usr/local/ophidia/src/ophidia-terminal
-COPY ophidia-terminal-cast.patch /usr/local/ophidia/src/ophidia-terminal/
-RUN patch -p1 < ophidia-terminal-cast.patch \
-  && ./bootstrap \
+RUN ./bootstrap \
   && ./configure --prefix=/usr/local/ophidia/oph-terminal \
-  && make && make install \
+  && make -j 4 && make install \
   && rm -rf /usr/local/ophidia/src/ophidia-terminal
 
 ####
