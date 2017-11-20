@@ -78,3 +78,13 @@ $ docker run -ti --rm --name oph-term \
 		--env OPH_PASSWD=abcd \
     bigsea/ophidia term
 ```
+
+
+# Examples
+## Creation of NetCDF containers
+
+## PyOphidia
+
+```bash
+$ ./docker-run python
+```

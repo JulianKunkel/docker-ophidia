@@ -26,6 +26,13 @@ function term {
     bigsea/ophidia term
 }
 
+function python {
+  echo "from PyOphidia import cube"
+  echo "import os"
+  echo "cube.Cube.setclient(os.environ['OPH_SERVER_ENV_OPH_USER'] , os.environ['OPH_SERVER_ENV_OPH_PASSWD'], os.environ['OPH_SERVER_PORT_11732_TCP_ADDR'],'11732')"
+  docker run -ti --rm --name oph-term  --link oph-server:oph-server  bigsea/ophidia python
+}
+
 case $1 in
   mysql)
     mysql
@@ -36,13 +43,16 @@ case $1 in
   term)
     term
   ;;
+  python)
+    python
+  ;;
   all)
     mysql
     server
     term
   ;;
   *)
-    echo "Usage: ${0} <all|mysql|server|term>"
+    echo "Usage: ${0} <all|mysql|server|term|python>"
     exit 0
 	;;
 esac
