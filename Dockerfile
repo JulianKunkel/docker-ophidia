@@ -69,7 +69,6 @@ RUN wget ftp://ftp.unidata.ucar.edu/pub/netcdf/netcdf-4.4.1.tar.gz -qO- | tar xz
 ###
 
 ### Ophidia projects
-
 WORKDIR /usr/local/ophidia/src
 COPY ophidia-primitives ./ophidia-primitives
 COPY ophidia-analytics-framework ./ophidia-analytics-framework
