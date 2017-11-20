@@ -6,7 +6,7 @@ RUN mkdir -p /usr/local/ophidia/src \
              /var/www/html/ophidia \
              /usr/local/lib/pkgconfig
 
-RUN echo "Acquire::http::Proxy \"http://roadrash:3142\";" | sudo tee /etc/apt/apt.conf.d/01proxy
+#RUN echo "Acquire::http::Proxy \"http://roadrash:3142\";" | sudo tee /etc/apt/apt.conf.d/01proxy
 
 RUN apt-get update && apt-get install -y \
 		guile-2.0-dev \
@@ -43,34 +43,33 @@ RUN apt-get update && apt-get install -y \
 ## gSoap
 WORKDIR /usr/local/ophidia/src/gsoap-2.8
 RUN wget \
-    -q http://tenet.dl.sourceforge.net/project/gsoap2/gSOAP/gsoap_2.8.27.zip \
+    -q https://downloads.sourceforge.net/project/gsoap2/gsoap-2.8/gsoap_2.8.55.zip \
     -O /tmp/gsoap.zip \
   && unzip -qq -d /usr/local/ophidia/src/ /tmp/gsoap.zip && rm /tmp/gsoap.zip \
   && ./configure --prefix=/usr/local/ophidia/extra && make && make install \
   && rm -rf /usr/local/ophidia/src/gsoap-2.8
 
 ## HDF5
-WORKDIR /usr/local/ophidia/src/hdf5-1.8.16
-RUN wget https://www.hdfgroup.org/ftp/HDF5/current/src/hdf5-1.8.16.tar.bz2 -qO- \
-    | tar xj -C /usr/local/ophidia/src/ \
+WORKDIR /usr/local/ophidia/src/hdf5/hdf5-1.10.1
+RUN wget https://support.hdfgroup.org/ftp/HDF5/current/src/hdf5-1.10.1.tar.bz2 -qO- | tar xj -C /usr/local/ophidia/src/hdf5 \
   && CC=/usr/bin/mpicc ./configure --prefix=/usr/local/ophidia/extra --enable-parallel \
   && make && make install \
-  && rm -rf /usr/local/ophidia/src/hdf5-1.8.16
+  && rm -rf /usr/local/ophidia/src/hdf5
 
 ## netCDF
-WORKDIR /usr/local/ophidia/src/netcdf-4.4.0
-RUN wget ftp://ftp.unidata.ucar.edu/pub/netcdf/netcdf-4.4.0.tar.gz -qO- \
-    | tar xz -C /usr/local/ophidia/src/ \
+WORKDIR /usr/local/ophidia/src/netcdf/netcdf-4.4.1
+RUN wget ftp://ftp.unidata.ucar.edu/pub/netcdf/netcdf-4.4.1.tar.gz -qO- | tar xz -C /usr/local/ophidia/src/netcdf \
   && CC=/usr/bin/mpicc \
      CPPFLAGS="-I/usr/local/ophidia/extra/include" \
      LDFLAGS="-L/usr/local/ophidia/extra/lib" \
      LIBS=-ldl \
      ./configure --prefix=/usr/local/ophidia/extra --enable-parallel-tests \
   && make && make install \
-  && rm -rf /usr/local/ophidia/src/netcdf-4.4.0
+  && rm -rf /usr/local/ophidia/src/netcdf
 ###
 
 ### Ophidia projects
+
 WORKDIR /usr/local/ophidia/src
 COPY ophidia-primitives ./ophidia-primitives
 COPY ophidia-analytics-framework ./ophidia-analytics-framework
