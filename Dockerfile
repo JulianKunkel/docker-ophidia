@@ -84,8 +84,7 @@ RUN ln -s /usr/lib/x86_64-linux-gnu/pkgconfig/libmatheval.pc /usr/local/lib/pkgc
 
 
 WORKDIR  /usr/local/ophidia/src/ophidia-analytics-framework
-RUN ./bootstrap \
- && ./configure  --prefix=/usr/local/ophidia/oph-cluster/oph-analytics-framework \
+RUN ./bootstrap && ./configure  --prefix=/usr/local/ophidia/oph-cluster/oph-analytics-framework \
                  --enable-parallel-netcdf --with-netcdf-path=/usr/local/ophidia/extra/ \
                  --with-web-server-path=/var/www/html/ophidia --with-web-server-url=http://oph-server/ophidia \
  && make -j 4 && make install \
@@ -160,7 +159,7 @@ RUN sed -i 's/\(<\/VirtualHost>\)/\tRedirectMatch permanent \/ophidia\/sessions\
 WORKDIR /usr/local/ophidia
 
 # important that the dir with the year exist:
-RUN mkdir -p /usr/local/ophidia/oph-server/authz/sessions/$(date +%Y)
+RUN mkdir -p /usr/local/ophidia/oph-server/authz/sessions/2017
 
 EXPOSE 11732
 ENV PATH=$PATH:/usr/local/ophidia/oph-cluster/oph-analytics-framework/bin:/usr/local/ophidia/oph-terminal/bin:/usr/local/ophidia/extra/bin:/usr/local/ophidia/oph-server/bin
