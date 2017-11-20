@@ -167,6 +167,9 @@ RUN sed -i 's/\(<\/VirtualHost>\)/\tRedirectMatch permanent \/ophidia\/sessions\
 
 WORKDIR /usr/local/ophidia
 
+# important that the dir with the year exist:
+RUN mkdir -p /usr/local/ophidia/oph-server/authz/sessions/$(date +%Y)
+
 EXPOSE 11732
 ENV PATH=$PATH:/usr/local/ophidia/oph-cluster/oph-analytics-framework/bin:/usr/local/ophidia/oph-terminal/bin:/usr/local/ophidia/extra/bin:/usr/local/ophidia/oph-server/bin
 ENV OPH_SERVER_HOST=""
@@ -176,3 +179,4 @@ ENV OPH_PASSWD=abcd
 ADD entrypoint /sbin/
 ENTRYPOINT ["/sbin/entrypoint"]
 CMD ["server"]
+
