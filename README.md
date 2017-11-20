@@ -38,7 +38,7 @@ Ophidia needs a MySQL instance with a set of specific libraries
 $ docker run --name oph_mysql -d \
   --volume ${PWD}/mysql/initdb:/docker-entrypoint-initdb.d \
   --env MYSQL_ROOT_PASSWORD=root \
-  bigsea/ophidia-mysql
+  bigsea/ophidia_mysql
 ```
 More info and features about this container can be found on [MySQL official
 container docs](https://hub.docker.com/_/mysql/)
